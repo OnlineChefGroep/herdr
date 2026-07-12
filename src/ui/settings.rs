@@ -423,7 +423,6 @@ fn render_settings_theme(app: &AppState, frame: &mut Frame, area: Rect) {
     frame.render_stateful_widget(list, area, &mut state);
 }
 
-
 fn render_settings_info(
     frame: &mut Frame,
     area: Rect,
@@ -438,10 +437,7 @@ fn render_settings_info(
     )));
     text.push(Line::from(""));
     for line in lines {
-        text.push(Line::from(Span::styled(
-            *line,
-            Style::default().fg(p.text),
-        )));
+        text.push(Line::from(Span::styled(*line, Style::default().fg(p.text))));
     }
     frame.render_widget(Paragraph::new(text), area);
 }

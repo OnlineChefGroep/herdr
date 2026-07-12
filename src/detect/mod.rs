@@ -64,6 +64,7 @@ pub enum Agent {
     Freebuff,
     Junie,
     OpenClaude,
+    Aider,
 }
 
 impl Agent {
@@ -117,6 +118,7 @@ pub fn agent_label(agent: Agent) -> &'static str {
         Agent::Freebuff => "freebuff",
         Agent::Junie => "junie",
         Agent::OpenClaude => "openclaude",
+        Agent::Aider => "aider",
     }
 }
 
@@ -146,6 +148,7 @@ pub fn parse_agent_label(agent: &str) -> Option<Agent> {
         "freebuff" | "freebuff-cli" => Some(Agent::Freebuff),
         "junie" | "junie-cli" => Some(Agent::Junie),
         "openclaude" | "open-claude" | "openclaude-cli" => Some(Agent::OpenClaude),
+        "aider" | "aider-chat" => Some(Agent::Aider),
         _ => None,
     }
 }
@@ -179,6 +182,7 @@ pub fn identify_agent(process_name: &str) -> Option<Agent> {
         "freebuff" | "freebuff-cli" => Some(Agent::Freebuff),
         "junie" | "junie-cli" => Some(Agent::Junie),
         "openclaude" | "open-claude" | "openclaude-cli" => Some(Agent::OpenClaude),
+        "aider" | "aider-chat" => Some(Agent::Aider),
         _ => None,
     }
 }
