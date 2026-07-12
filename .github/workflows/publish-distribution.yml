@@ -1,5 +1,8 @@
 name: Publish distribution
 
+# Publishes onlinechefgroep-herdr to npmjs.org after a GitHub release.
+# Required secret: NPM_TOKEN (org-level, visibility all — same as pi-agent-orchestrator).
+
 on:
   release:
     types: [published]
@@ -66,10 +69,9 @@ jobs:
         with:
           node-version: "22"
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          test -n "$NODE_AUTH_TOKEN" || { echo "NPM_TOKEN secret missing"; exit 1; }
-          npm publish --access public
+        run: npm publish --access public
