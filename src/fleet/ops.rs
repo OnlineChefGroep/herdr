@@ -162,7 +162,9 @@ fn derive_git_context(cwd: &Path) -> (Option<String>, Option<String>, Option<Str
         });
 
     let worktree = if repo.is_some() {
-        cwd.file_name().and_then(|n| n.to_str()).map(|s| s.to_string())
+        cwd.file_name()
+            .and_then(|n| n.to_str())
+            .map(|s| s.to_string())
     } else {
         None
     };
@@ -236,4 +238,3 @@ mod tests {
         assert!(bar.contains("resume"));
     }
 }
-
