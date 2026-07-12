@@ -149,6 +149,38 @@ pub(super) fn render_settings_overlay(app: &AppState, frame: &mut Frame, area: R
                 app.settings.list.selected,
             );
         }
+        SettingsSection::Appearance => {
+            render_settings_appearance(app, frame, content_area);
+        }
+        SettingsSection::Fleet => {
+            render_settings_info(
+                frame,
+                content_area,
+                p,
+                "CHEF Fleet Operations",
+                &[
+                    "fleet ops bar shows per-pane agent metadata",
+                    "configure via: src/fleet/ops.rs",
+                    "plugins: linear, github, fleet-health, cloudflare, kater-bridge",
+                    "API gateway: http://127.0.0.1:7777 (systemd: herdr-gateway)",
+                ],
+            );
+        }
+        SettingsSection::Plugins => {
+            render_settings_info(
+                frame,
+                content_area,
+                p,
+                "Plugin Marketplace",
+                &[
+                    "install plugins: herdr plugin install <id>",
+                    "marketplace: github.com/OnlineChefGroep/herdr-plugins",
+                    "available: linear-context, github-status, fleet-health,",
+                    "           cloudflare-tunnel, session-park, kater-bridge",
+                    "settings prefix+S opens this overlay",
+                ],
+            );
+        }
         SettingsSection::Experiments => {
             render_settings_experiments(app, frame, content_area);
         }
@@ -391,6 +423,29 @@ fn render_settings_theme(app: &AppState, frame: &mut Frame, area: Rect) {
     frame.render_stateful_widget(list, area, &mut state);
 }
 
+
+fn render_settings_info(
+    frame: &mut Frame,
+    area: Rect,
+    p: &crate::app::state::Palette,
+    title: &str,
+    lines: &[&str],
+) {
+    let mut text = Vec::new();
+    text.push(Line::from(Span::styled(
+        title,
+        Style::default().fg(p.accent).add_modifier(Modifier::BOLD),
+    )));
+    text.push(Line::from(""));
+    for line in lines {
+        text.push(Line::from(Span::styled(
+            *line,
+            Style::default().fg(p.text),
+        )));
+    }
+    frame.render_widget(Paragraph::new(text), area);
+}
+
 fn render_settings_toggle(
     frame: &mut Frame,
     area: Rect,
@@ -411,6 +466,75 @@ fn render_settings_toggle(
         p,
         1,
     );
+}
+
+fn render_settings_appearance(app: &AppState, frame: &mut Frame, area: Rect) {
+    use crate::config::SpinnerStyle;
+    let p = &app.palette;
+
+    let [desc_area, _, list_area] = Layout::vertical([
+        Constraint::Length(2),
+        Constraint::Length(1),
+        Constraint::Min(1),
+    ])
+    .areas::<3>(area);
+
+    super::widgets::render_modal_description(
+        frame,
+        desc_area,
+        "choose a spinner animation style for working agents",
+        Style::default().fg(p.overlay1),
+    );
+
+    let current_idx = SpinnerStyle::ALL
+        .iter()
+        .position(|&s| s == app.spinner_style)
+        .unwrap_or(0);
+    let scroll = if app.settings.list.selected >= list_area.height as usize {
+        app.settings.list.selected - list_area.height as usize + 1
+    } else {
+        0
+    };
+
+    let col_width = (list_area.width as usize / 2).max(20);
+    let tick = app.spinner_tick;
+
+    for (idx, &style) in SpinnerStyle::ALL.iter().enumerate() {
+        let visible_idx = idx.saturating_sub(scroll);
+        if visible_idx >= list_area.height as usize {
+            break;
+        }
+        let col = visible_idx % 2;
+        let row = visible_idx / 2;
+        let x = list_area.x + col as u16 * col_width as u16;
+        let y = list_area.y + row as u16;
+        let is_selected = idx == app.settings.list.selected;
+        let is_current = idx == current_idx;
+        let preview_frame = style.frames()[(tick as usize / style.speed_divisor() as usize) % style.frames().len()];
+
+        let marker = if is_current { "✓" } else { " " };
+        let style_fg = if is_selected {
+            p.text
+        } else {
+            p.subtext0
+        };
+        let row_style = if is_selected {
+            Style::default().bg(p.surface0).fg(p.text).add_modifier(Modifier::BOLD)
+        } else {
+            Style::default().fg(style_fg)
+        };
+
+        let line = Line::from(vec![
+            Span::styled(format!(" {marker} "), row_style),
+            Span::styled(preview_frame.to_string(), Style::default().fg(p.yellow)),
+            Span::styled("  ", row_style),
+            Span::styled(style.label(), row_style),
+        ]);
+        frame.render_widget(
+            Paragraph::new(line),
+            Rect::new(x, y, col_width as u16, 1),
+        );
+    }
 }
 
 fn render_settings_experiments(app: &AppState, frame: &mut Frame, area: Rect) {

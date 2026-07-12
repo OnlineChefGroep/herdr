@@ -877,6 +877,9 @@ pub enum SettingsSection {
     Sound,
     Toast,
     PaneLabels,
+    Appearance,
+    Fleet,
+    Plugins,
     Experiments,
     Integrations,
 }
@@ -887,6 +890,9 @@ impl SettingsSection {
         Self::Sound,
         Self::Toast,
         Self::PaneLabels,
+        Self::Appearance,
+        Self::Fleet,
+        Self::Plugins,
         Self::Integrations,
         Self::Experiments,
     ];
@@ -897,6 +903,9 @@ impl SettingsSection {
             Self::Sound => "sound",
             Self::Toast => "toasts",
             Self::PaneLabels => "pane labels",
+            Self::Appearance => "appearance",
+            Self::Fleet => "fleet",
+            Self::Plugins => "plugins",
             Self::Experiments => "experiments",
             Self::Integrations => "integrations",
         }
@@ -1422,6 +1431,8 @@ pub struct AppState {
     pub keybinds: Keybinds,
     /// Frame counter for spinner animations (wraps around).
     pub spinner_tick: u32,
+    /// Active spinner animation style.
+    pub spinner_style: crate::config::SpinnerStyle,
     /// UI color palette — all sidebar/UI colors centralized for theming.
     pub palette: Palette,
     /// Currently applied theme name (for settings UI).
@@ -1772,6 +1783,7 @@ impl AppState {
             toast_config: ToastConfig::default(),
             keybinds: Keybinds::default(),
             spinner_tick: 0,
+            spinner_style: crate::config::SpinnerStyle::Dots,
             palette: Palette::catppuccin(),
             theme_name: "catppuccin".to_string(),
             theme_runtime: ThemeRuntimeConfig {
