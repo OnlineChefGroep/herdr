@@ -171,9 +171,6 @@ impl AttachEscapeState {
 fn attach_prefix_byte(code: KeyCode, mods: KeyModifiers) -> Option<u8> {
     use crate::input::{encode_terminal_key, KeyboardProtocol, TerminalKey};
 
-    if mods != KeyModifiers::CONTROL {
-        return None;
-    }
     let bytes = encode_terminal_key(TerminalKey::new(code, mods), KeyboardProtocol::Legacy);
     (bytes.len() == 1).then(|| bytes[0])
 }
@@ -848,7 +845,14 @@ pub fn run_client() -> io::Result<()> {
 pub fn run_terminal_attach(terminal_id: String, takeover: bool) -> io::Result<()> {
     let loaded_config = crate::config::Config::load();
     let (code, mods) = loaded_config.config.prefix_key();
-    let prefix_byte = attach_prefix_byte(code, mods).unwrap_or(0x01);
+    let prefix_byte = attach_prefix_byte(code, mods).ok_or_else(|| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!(
+                "direct terminal attach requires a prefix key that encodes to exactly one byte; configured prefix {code:?} with modifiers {mods:?} does not"
+            ),
+        )
+    })?;
     run_client_with_mode(
         RenderEncoding::TerminalAnsi,
         Some((terminal_id, takeover)),
