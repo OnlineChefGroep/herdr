@@ -19,6 +19,7 @@ pub(super) enum SettingsAction {
     SaveAgentBorderLabels(bool),
     SavePaneHistory(bool),
     SaveSwitchAsciiInputSourceInPrefix(bool),
+    SaveSpinnerStyle(crate::config::SpinnerStyle),
     InstallRecommendedIntegrations,
 }
 
@@ -53,6 +54,7 @@ impl App {
                 SettingsAction::SaveSwitchAsciiInputSourceInPrefix(enabled) => {
                     self.save_switch_ascii_input_source_in_prefix(enabled)
                 }
+                SettingsAction::SaveSpinnerStyle(style) => self.save_spinner_style(style),
                 SettingsAction::InstallRecommendedIntegrations => {
                     self.install_recommended_integrations()
                 }
@@ -151,8 +153,59 @@ fn apply_settings(state: &mut AppState) -> Option<SettingsAction> {
 
 pub(super) fn update_settings_state(state: &mut AppState, key: KeyEvent) -> Option<SettingsAction> {
     match state.settings.section {
-        SettingsSection::Fleet | SettingsSection::Plugins => {
-            return None;
+        SettingsSection::Appearance => match key.code {
+            KeyCode::Up | KeyCode::Char('k') => state.settings.list.move_prev(),
+            KeyCode::Down | KeyCode::Char('j') => {
+                state.settings.list.move_next(crate::config::SpinnerStyle::ALL.len())
+            }
+            KeyCode::Enter | KeyCode::Char(' ') => {
+                return crate::config::SpinnerStyle::ALL
+                    .get(state.settings.list.selected)
+                    .copied()
+                    .map(SettingsAction::SaveSpinnerStyle);
+            }
+            KeyCode::BackTab | KeyCode::Left | KeyCode::Char('h') => {
+                state.settings.section = SettingsSection::PaneLabels;
+                state.settings.list.selected =
+                    usize::from(!state.agent_border_labels_enabled());
+            }
+            KeyCode::Tab | KeyCode::Right | KeyCode::Char('l') => {
+                state.settings.section = SettingsSection::Fleet;
+                state.settings.list.selected = 0;
+            }
+            _ => {
+                if let Some(super::modal::ModalAction::Close) =
+                    super::modal::modal_action_from_key(&key, super::modal::SETTINGS_ACTIONS)
+                {
+                    cancel_settings(state);
+                }
+            }
+        },
+        SettingsSection::Fleet => {
+            if let KeyCode::Tab | KeyCode::Right | KeyCode::Char('l') = key.code {
+                state.settings.section = SettingsSection::Plugins;
+                state.settings.list.selected = 0;
+            } else if let KeyCode::BackTab | KeyCode::Left | KeyCode::Char('h') = key.code {
+                state.settings.section = SettingsSection::Appearance;
+                state.settings.list.selected = 0;
+            } else if let Some(super::modal::ModalAction::Close) =
+                super::modal::modal_action_from_key(&key, super::modal::SETTINGS_ACTIONS)
+            {
+                cancel_settings(state);
+            }
+        }
+        SettingsSection::Plugins => {
+            if let KeyCode::Tab | KeyCode::Right | KeyCode::Char('l') = key.code {
+                state.settings.section = SettingsSection::Integrations;
+                state.settings.list.selected = 0;
+            } else if let KeyCode::BackTab | KeyCode::Left | KeyCode::Char('h') = key.code {
+                state.settings.section = SettingsSection::Fleet;
+                state.settings.list.selected = 0;
+            } else if let Some(super::modal::ModalAction::Close) =
+                super::modal::modal_action_from_key(&key, super::modal::SETTINGS_ACTIONS)
+            {
+                cancel_settings(state);
+            }
         }
         SettingsSection::Theme => match key.code {
             KeyCode::Up | KeyCode::Char('k') => {
@@ -243,7 +296,7 @@ pub(super) fn update_settings_state(state: &mut AppState, key: KeyEvent) -> Opti
                 state.settings.list.selected = toast_delivery_index(state.toast_delivery());
             }
             KeyCode::Tab | KeyCode::Right | KeyCode::Char('l') => {
-                state.settings.section = SettingsSection::Integrations;
+                state.settings.section = SettingsSection::Appearance;
                 state.settings.list.selected = 0;
             }
             _ => {
@@ -317,6 +370,7 @@ pub(crate) fn open_settings_at(state: &mut AppState, section: SettingsSection) {
         SettingsSection::PaneLabels => usize::from(!state.agent_border_labels_enabled()),
         SettingsSection::Experiments => 0,
         SettingsSection::Integrations => 0,
+        SettingsSection::Appearance => 0,
         SettingsSection::Fleet => 0,
         SettingsSection::Plugins => 0,
     };
@@ -379,6 +433,14 @@ impl AppState {
 
         match self.settings.section {
             SettingsSection::Fleet | SettingsSection::Plugins => None,
+            SettingsSection::Appearance => {
+                let list_y = area.y + 2;
+                if row < list_y { return None; }
+                let col_width = (area.width as usize / 2).max(20);
+                let col = if (col - area.x) as usize >= col_width { 1 } else { 0 };
+                let visible_idx = (row - list_y) as usize * 2 + col;
+                (visible_idx < crate::config::SpinnerStyle::ALL.len()).then_some(visible_idx)
+            }
             SettingsSection::Theme => {
                 let max_visible = area.height as usize;
                 let scroll = if self.settings.list.selected >= max_visible {
@@ -439,7 +501,8 @@ impl AppState {
                         }
                         SettingsSection::Experiments => 0,
                         SettingsSection::Integrations => 0,
-                        SettingsSection::Fleet => 0,
+                        SettingsSection::Appearance => 0,
+        SettingsSection::Fleet => 0,
                         SettingsSection::Plugins => 0,
                     });
                     return None;
@@ -464,6 +527,10 @@ impl AppState {
                             Some(SettingsAction::SaveAgentBorderLabels(enabled))
                         }
                         SettingsSection::Experiments => experiment_toggle_action(self, idx),
+                        SettingsSection::Appearance => {
+                            crate::config::SpinnerStyle::ALL.get(idx).copied()
+                                .map(SettingsAction::SaveSpinnerStyle)
+                        }
                         SettingsSection::Fleet | SettingsSection::Plugins => None,
                         SettingsSection::Integrations => None,
                     };
@@ -591,45 +658,47 @@ mod tests {
     }
 
     #[test]
-    fn settings_tab_cycle_places_experiments_last() {
+    fn settings_tab_pane_labels_to_appearance() {
         let mut state = state_with_workspaces(&["test"]);
         open_settings_at(&mut state, SettingsSection::PaneLabels);
-
         update_settings_state(
             &mut state,
             KeyEvent::new(KeyCode::Tab, KeyModifiers::empty()),
         );
-        assert_eq!(state.settings.section, SettingsSection::Integrations);
+        assert_eq!(state.settings.section, SettingsSection::Appearance);
+    }
 
+    #[test]
+    fn settings_tab_appearance_to_fleet() {
+        let mut state = state_with_workspaces(&["test"]);
+        open_settings_at(&mut state, SettingsSection::Appearance);
         update_settings_state(
             &mut state,
             KeyEvent::new(KeyCode::Tab, KeyModifiers::empty()),
         );
-        assert_eq!(state.settings.section, SettingsSection::Experiments);
+        assert_eq!(state.settings.section, SettingsSection::Fleet);
+    }
 
+    #[test]
+    fn settings_tab_fleet_to_plugins() {
+        let mut state = state_with_workspaces(&["test"]);
+        open_settings_at(&mut state, SettingsSection::Fleet);
         update_settings_state(
             &mut state,
             KeyEvent::new(KeyCode::Tab, KeyModifiers::empty()),
         );
-        assert_eq!(state.settings.section, SettingsSection::Theme);
+        assert_eq!(state.settings.section, SettingsSection::Plugins);
+    }
 
+    #[test]
+    fn settings_backtab_plugins_to_fleet() {
+        let mut state = state_with_workspaces(&["test"]);
+        open_settings_at(&mut state, SettingsSection::Plugins);
         update_settings_state(
             &mut state,
             KeyEvent::new(KeyCode::BackTab, KeyModifiers::empty()),
         );
-        assert_eq!(state.settings.section, SettingsSection::Experiments);
-
-        update_settings_state(
-            &mut state,
-            KeyEvent::new(KeyCode::BackTab, KeyModifiers::empty()),
-        );
-        assert_eq!(state.settings.section, SettingsSection::Integrations);
-
-        update_settings_state(
-            &mut state,
-            KeyEvent::new(KeyCode::BackTab, KeyModifiers::empty()),
-        );
-        assert_eq!(state.settings.section, SettingsSection::PaneLabels);
+        assert_eq!(state.settings.section, SettingsSection::Fleet);
     }
 
     #[test]
