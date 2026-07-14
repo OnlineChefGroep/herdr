@@ -4493,7 +4493,7 @@ new_tab = "prefix+t"
         }));
         assert_eq!(
             server.app.state.prefix_code,
-            crossterm::event::KeyCode::Char('b')
+            crossterm::event::KeyCode::Char('a')
         );
         assert!(server
             .app
@@ -4684,7 +4684,7 @@ next_tab = ""
         }));
         assert_eq!(
             server.app.state.prefix_code,
-            crossterm::event::KeyCode::Char('b')
+            crossterm::event::KeyCode::Char('a')
         );
         assert!(!server
             .app
