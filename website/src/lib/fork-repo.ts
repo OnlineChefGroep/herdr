@@ -1,4 +1,4 @@
-/** OnlineChefGroep downstream distribution repo (not upstream ogulcancelik/herdr). */
+/** OnlineChefGroep downstream distribution repo (not upstream OnlineChefGroep/herdr). */
 export const FORK_GITHUB_REPO = "OnlineChefGroep/herdr";
 
 export function forkGitHubUrl(path = ""): string {

@@ -1658,22 +1658,22 @@ mod tests {
 
     #[test]
     fn github_plugin_source_parses_root_repo() {
-        let source = GithubPluginSource::parse("ogulcancelik/herdr-plugin-examples").unwrap();
-        assert_eq!(source.owner, "ogulcancelik");
+        let source = GithubPluginSource::parse("OnlineChefGroep/herdr-plugin-examples").unwrap();
+        assert_eq!(source.owner, "OnlineChefGroep");
         assert_eq!(source.repo, "herdr-plugin-examples");
         assert_eq!(source.subdir, None);
         assert_eq!(
             source.remote_url(),
-            "https://github.com/ogulcancelik/herdr-plugin-examples.git"
+            "https://github.com/OnlineChefGroep/herdr-plugin-examples.git"
         );
     }
 
     #[test]
     fn github_plugin_source_parses_subdir() {
         let source =
-            GithubPluginSource::parse("ogulcancelik/herdr-plugin-examples/worktree-bootstrap")
+            GithubPluginSource::parse("OnlineChefGroep/herdr-plugin-examples/worktree-bootstrap")
                 .unwrap();
-        assert_eq!(source.owner, "ogulcancelik");
+        assert_eq!(source.owner, "OnlineChefGroep");
         assert_eq!(source.repo, "herdr-plugin-examples");
         assert_eq!(source.subdir.as_deref(), Some("worktree-bootstrap"));
     }
@@ -1681,11 +1681,11 @@ mod tests {
     #[test]
     fn github_plugin_source_rejects_non_shorthand_sources() {
         for source in [
-            "https://github.com/ogulcancelik/herdr-plugin-examples",
-            "git@github.com:ogulcancelik/herdr-plugin-examples.git",
-            "ogulcancelik",
-            "ogulcancelik/herdr-plugin-examples/../bad",
-            "ogulcancelik/herdr-plugin-examples//bad",
+            "https://github.com/OnlineChefGroep/herdr-plugin-examples",
+            "git@github.com:OnlineChefGroep/herdr-plugin-examples.git",
+            "OnlineChefGroep",
+            "OnlineChefGroep/herdr-plugin-examples/../bad",
+            "OnlineChefGroep/herdr-plugin-examples//bad",
         ] {
             assert!(
                 GithubPluginSource::parse(source).is_err(),
@@ -1697,18 +1697,18 @@ mod tests {
     #[test]
     fn github_source_lookup_matches_installed_plugin_source() {
         let source =
-            GithubPluginSource::parse("ogulcancelik/herdr-plugin-examples/agent-telegram-notify")
+            GithubPluginSource::parse("OnlineChefGroep/herdr-plugin-examples/agent-telegram-notify")
                 .unwrap();
         let plugins = vec![
             github_plugin(
                 "examples.github-link-preview",
-                "ogulcancelik",
+                "OnlineChefGroep",
                 "herdr-plugin-examples",
                 Some("github-link-preview"),
             ),
             github_plugin(
                 "examples.agent-telegram-notify",
-                "ogulcancelik",
+                "OnlineChefGroep",
                 "herdr-plugin-examples",
                 Some("agent-telegram-notify"),
             ),
@@ -1720,10 +1720,10 @@ mod tests {
 
     #[test]
     fn github_source_lookup_requires_exact_subdir() {
-        let source = GithubPluginSource::parse("ogulcancelik/herdr-plugin-examples").unwrap();
+        let source = GithubPluginSource::parse("OnlineChefGroep/herdr-plugin-examples").unwrap();
         let plugins = vec![github_plugin(
             "examples.agent-telegram-notify",
-            "ogulcancelik",
+            "OnlineChefGroep",
             "herdr-plugin-examples",
             Some("agent-telegram-notify"),
         )];
@@ -1733,10 +1733,10 @@ mod tests {
 
     #[test]
     fn github_source_lookup_ignores_local_plugins() {
-        let source = GithubPluginSource::parse("ogulcancelik/herdr-plugin-examples").unwrap();
+        let source = GithubPluginSource::parse("OnlineChefGroep/herdr-plugin-examples").unwrap();
         let mut plugin = github_plugin(
             "examples.local",
-            "ogulcancelik",
+            "OnlineChefGroep",
             "herdr-plugin-examples",
             None,
         );

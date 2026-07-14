@@ -3430,7 +3430,7 @@ command = ["sh", "-c", "echo bootstrap"]
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -3444,7 +3444,7 @@ command = ["sh", "-c", "echo bootstrap"]
             "plugins",
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/worktree-bootstrap",
+            "OnlineChefGroep/herdr-plugin-examples/worktree-bootstrap",
             "--yes",
         ],
         &[
@@ -3467,7 +3467,7 @@ command = ["sh", "-c", "echo bootstrap"]
     let plugin = &listed["result"]["plugins"][0];
     assert_eq!(plugin["plugin_id"], "example.worktree-bootstrap");
     assert_eq!(plugin["source"]["kind"], "github");
-    assert_eq!(plugin["source"]["owner"], "ogulcancelik");
+    assert_eq!(plugin["source"]["owner"], "OnlineChefGroep");
     assert_eq!(plugin["source"]["repo"], "herdr-plugin-examples");
     assert_eq!(plugin["source"]["subdir"], "worktree-bootstrap");
     assert!(plugin["source"]["resolved_commit"].as_str().is_some());
@@ -3560,7 +3560,7 @@ command = ["sh", "-c", "echo should-not-install"]
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -3574,7 +3574,7 @@ command = ["sh", "-c", "echo should-not-install"]
             "plugins",
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/build-fail",
+            "OnlineChefGroep/herdr-plugin-examples/build-fail",
             "--yes",
         ],
         &[("GIT_CONFIG_GLOBAL", &git_config)],
@@ -3654,7 +3654,7 @@ command = ["sh", "-c", "echo should-not-install"]
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -3668,7 +3668,7 @@ command = ["sh", "-c", "echo should-not-install"]
             "plugins",
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/missing-tool",
+            "OnlineChefGroep/herdr-plugin-examples/missing-tool",
             "--yes",
         ],
         &[("GIT_CONFIG_GLOBAL", &git_config)],
@@ -3763,7 +3763,7 @@ EOF
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -3777,7 +3777,7 @@ EOF
             "plugins",
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/manifest-mutator",
+            "OnlineChefGroep/herdr-plugin-examples/manifest-mutator",
             "--yes",
         ],
         &[("GIT_CONFIG_GLOBAL", &git_config)],
@@ -3853,7 +3853,7 @@ command = ["sh", "-c", "echo new"]
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -3885,7 +3885,7 @@ command = ["sh", "-c", "echo new"]
                         "enabled": true,
                         "source": {
                             "kind": "github",
-                            "owner": "ogulcancelik",
+                            "owner": "OnlineChefGroep",
                             "repo": "herdr-plugin-examples",
                             "subdir": "worktree-bootstrap",
                             "resolved_commit": "old",
@@ -3920,7 +3920,7 @@ command = ["sh", "-c", "echo new"]
         &[
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/worktree-bootstrap",
+            "OnlineChefGroep/herdr-plugin-examples/worktree-bootstrap",
             "--yes",
         ],
         &[("GIT_CONFIG_GLOBAL", &git_config)],
@@ -3982,7 +3982,7 @@ command = ["sh", "-c", "echo install"]
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -4057,7 +4057,7 @@ command = ["sh", "-c", "echo install"]
         &[
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/worktree-bootstrap",
+            "OnlineChefGroep/herdr-plugin-examples/worktree-bootstrap",
             "--yes",
         ],
         &[("GIT_CONFIG_GLOBAL", &git_config)],
@@ -4119,7 +4119,7 @@ command = ["sh", "-c", "echo install"]
     fs::write(
         &git_config,
         format!(
-            "[url \"file://{}\"]\n    insteadOf = https://github.com/ogulcancelik/herdr-plugin-examples.git\n",
+            "[url \"file://{}\"]\n    insteadOf = https://github.com/OnlineChefGroep/herdr-plugin-examples.git\n",
             source_repo.display()
         ),
     )
@@ -4186,7 +4186,7 @@ command = ["sh", "-c", "echo install"]
         &[
             "plugin",
             "install",
-            "ogulcancelik/herdr-plugin-examples/worktree-bootstrap",
+            "OnlineChefGroep/herdr-plugin-examples/worktree-bootstrap",
             "--yes",
         ],
         &[("GIT_CONFIG_GLOBAL", &git_config)],

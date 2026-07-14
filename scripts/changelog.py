@@ -11,7 +11,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-DEFAULT_LIVE_MANIFEST_URL = "https://herdr.dev/latest.json"
+DEFAULT_LIVE_MANIFEST_URL = "https://herdr.chefgroep.nl/latest.json"
 
 SECTION_RE = re.compile(r"^##\s+(?:\[(?P<bracketed>[^\]]+)\]|(?P<plain>.+?))\s*$", re.MULTILINE)
 VERSION_WITH_DATE_RE = re.compile(r"^(?P<version>.+?)\s+-\s+\d{4}-\d{2}-\d{2}$")

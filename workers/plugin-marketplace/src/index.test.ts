@@ -26,11 +26,11 @@ class MemoryKV {
 function repo(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: 1,
-    full_name: "ogulcancelik/herdr-plugin-example",
-    owner: { login: "ogulcancelik" },
+    full_name: "OnlineChefGroep/herdr-plugin-example",
+    owner: { login: "OnlineChefGroep" },
     name: "herdr-plugin-example",
     description: "Example plugin",
-    html_url: "https://github.com/ogulcancelik/herdr-plugin-example",
+    html_url: "https://github.com/OnlineChefGroep/herdr-plugin-example",
     stargazers_count: 5,
     forks_count: 1,
     open_issues_count: 0,
@@ -62,11 +62,11 @@ describe("normalizeRepositories", () => {
 
     expect(plugin).toEqual({
       id: 1,
-      fullName: "ogulcancelik/herdr-plugin-example",
-      owner: "ogulcancelik",
+      fullName: "OnlineChefGroep/herdr-plugin-example",
+      owner: "OnlineChefGroep",
       name: "herdr-plugin-example",
       description: "Example plugin",
-      url: "https://github.com/ogulcancelik/herdr-plugin-example",
+      url: "https://github.com/OnlineChefGroep/herdr-plugin-example",
       stars: 5,
       forks: 1,
       openIssues: 0,
@@ -113,7 +113,7 @@ describe("normalizeRepositories", () => {
 
   test("drops unsafe urls, archived repositories, forks, disabled repositories, and private repositories", () => {
     const plugins = normalizeRepositories([
-      repo({ html_url: "https://example.com/ogulcancelik/herdr-plugin-example" }),
+      repo({ html_url: "https://example.com/OnlineChefGroep/herdr-plugin-example" }),
       repo({ archived: true }),
       repo({ fork: true }),
       repo({ disabled: true }),
@@ -220,10 +220,10 @@ describe("refreshPlugins", () => {
           }),
           repo({
             id: 2,
-            full_name: "ogulcancelik/herdr-plugin-example",
-            owner: { login: "ogulcancelik" },
+            full_name: "OnlineChefGroep/herdr-plugin-example",
+            owner: { login: "OnlineChefGroep" },
             name: "herdr-plugin-example",
-            html_url: "https://github.com/ogulcancelik/herdr-plugin-example",
+            html_url: "https://github.com/OnlineChefGroep/herdr-plugin-example",
           }),
         ],
       });
@@ -237,7 +237,7 @@ describe("refreshPlugins", () => {
     expect(result.ok).toBe(true);
     const snapshot = JSON.parse(bucket.objects.get("plugins/index.json")?.value ?? "");
     expect(snapshot.plugins.map((plugin: { fullName: string }) => plugin.fullName)).toEqual([
-      "ogulcancelik/herdr-plugin-example",
+      "OnlineChefGroep/herdr-plugin-example",
     ]);
   });
 
@@ -329,7 +329,7 @@ describe("refreshPlugins", () => {
 
 describe("fetch handler", () => {
   test("does not expose a public Worker API", async () => {
-    const response = await worker.fetch(new Request("https://herdr.dev/api/plugins"), env());
+    const response = await worker.fetch(new Request("https://herdr.chefgroep.nl/api/plugins"), env());
 
     expect(response.status).toBe(404);
     expect(response.headers.get("Cache-Control")).toBe("no-store");

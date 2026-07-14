@@ -559,7 +559,7 @@ This is a hotfix for v0.6.3. See the v0.6.3 notes for the full feature release.
 ## [0.5.1] - 2026-04-25
 
 ### Added
-- Toast notifications can now be delivered through the outer terminal as desktop notifications. Configure this with `ui.toast.delivery = "terminal"`; see the [configuration docs](https://herdr.dev/docs/configuration/) for details.
+- Toast notifications can now be delivered through the outer terminal as desktop notifications. Configure this with `ui.toast.delivery = "terminal"`; see the [configuration docs](https://herdr.chefgroep.nl/docs/configuration/) for details.
 - Herdr now writes separate capped support logs for app, client, and server modes, making persistent-session issue reports easier to diagnose without unbounded log growth.
 - The bundled opencode plugin now reports question prompts as blocked while waiting for user input, then returns to working or idle when answered or dismissed. Question prompts are also detected by the default terminal-screen heuristics. (#51, thanks @mspiegel31)
 
@@ -836,7 +836,7 @@ This is a hotfix for v0.6.3. See the v0.6.3 notes for the full feature release.
 ### Added
 - Added first-run onboarding flow that lets you choose notification preferences (sound and toast) on startup.
 - Added optional visual toast notifications in the top-right corner for background workspace events (completion and attention-needed alerts).
-- Added configurable keybindings for all navigate mode actions: new workspace, rename workspace, close workspace, resize mode, and toggle sidebar. See the [configuration docs](https://herdr.dev/docs/configuration/) for the full key reference.
+- Added configurable keybindings for all navigate mode actions: new workspace, rename workspace, close workspace, resize mode, and toggle sidebar. See the [configuration docs](https://herdr.chefgroep.nl/docs/configuration/) for the full key reference.
 - Added configuration validation with startup diagnostics. Invalid key combinations or duplicate bindings now fall back to safe defaults with a visible warning.
 
 ### Changed

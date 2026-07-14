@@ -7,8 +7,8 @@ const checks: { name: string; run: () => string }[] = [
   { name: "cargo", run: () => execSync("cargo --version", { encoding: "utf8" }).trim() },
   { name: "zig", run: () => execSync("zig version", { encoding: "utf8" }).trim() },
   { name: "git", run: () => execSync("git --version", { encoding: "utf8" }).trim() },
-  { name: "upstream-behind", run: () => execSync("git rev-list --count HEAD..upstream/master", { encoding: "utf8" }).trim() + " commits" },
-  { name: "downstream-ahead", run: () => execSync("git rev-list --count $(git merge-base HEAD upstream/master)..HEAD", { encoding: "utf8" }).trim() + " commits" },
+  { name: "upstream-behind", run: () => execSync("git rev-list --count HEAD..upstream/main", { encoding: "utf8" }).trim() + " commits" },
+  { name: "downstream-ahead", run: () => execSync("git rev-list --count $(git merge-base HEAD upstream/main)..HEAD", { encoding: "utf8" }).trim() + " commits" },
   { name: "rust-toolchain", run: () => Bun.file("rust-toolchain.toml").exists() ? "present" : "MISSING" },
   { name: "DOWNSTREAM.md", run: () => Bun.file("DOWNSTREAM.md").exists() ? "present" : "MISSING" },
 ];
