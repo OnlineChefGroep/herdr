@@ -462,8 +462,8 @@ fn read_initial_request_line_with_limits(
     result
 }
 
-#[cfg(all(test, windows))]
-mod windows_tests {
+#[cfg(test)]
+mod initial_request_tests {
     use super::*;
     use interprocess::local_socket::traits::Listener as _;
     use std::io::{BufRead, BufReader};

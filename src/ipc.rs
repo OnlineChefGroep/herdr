@@ -1,5 +1,5 @@
 use std::fs;
-use std::io::{self, Read};
+use std::io;
 #[cfg(unix)]
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::path::Path;
@@ -109,103 +109,18 @@ fn stale_socket_connect_error(kind: io::ErrorKind) -> bool {
 }
 
 pub(crate) fn local_stream_peer_closed(stream: &mut LocalStream) -> io::Result<bool> {
-    probe_stream_closed(stream)
+    crate::platform::ipc::probe_stream_closed(stream)
 }
 
 pub(crate) fn set_local_stream_polling(stream: &mut LocalStream, enabled: bool) -> io::Result<()> {
-    #[cfg(unix)]
-    {
-        stream.set_nonblocking(enabled)
-    }
-
-    #[cfg(windows)]
-    {
-        let _ = (stream, enabled);
-        Ok(())
-    }
+    crate::platform::ipc::set_local_stream_polling(stream, enabled)
 }
 
 pub(crate) fn poll_local_stream_read(
     stream: &mut LocalStream,
     buf: &mut [u8],
 ) -> io::Result<LocalStreamRead> {
-    #[cfg(unix)]
-    {
-        match stream.read(buf) {
-            Ok(0) => Ok(LocalStreamRead::Closed),
-            Ok(_) => Ok(LocalStreamRead::Data),
-            Err(err) if err.kind() == io::ErrorKind::WouldBlock => Ok(LocalStreamRead::Pending),
-            Err(err) => Err(err),
-        }
-    }
-
-    #[cfg(windows)]
-    {
-        match windows_named_pipe_available(stream)? {
-            None => Ok(LocalStreamRead::Closed),
-            Some(0) => Ok(LocalStreamRead::Pending),
-            Some(_) => match stream.read(buf) {
-                Ok(0) => Ok(LocalStreamRead::Closed),
-                Ok(_) => Ok(LocalStreamRead::Data),
-                Err(err) if is_connection_closed_error(&err) => Ok(LocalStreamRead::Closed),
-                Err(err) => Err(err),
-            },
-        }
-    }
-}
-
-#[cfg(unix)]
-fn probe_stream_closed(stream: &mut LocalStream) -> io::Result<bool> {
-    stream.set_nonblocking(true)?;
-    let mut probe = [0u8; 1];
-    let status = match stream.read(&mut probe) {
-        Ok(0) => Ok(true),
-        Ok(_) => Ok(true),
-        Err(err)
-            if matches!(
-                err.kind(),
-                io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted
-            ) =>
-        {
-            Ok(false)
-        }
-        Err(err) if is_connection_closed_error(&err) => Ok(true),
-        Err(err) => Err(err),
-    };
-    stream.set_nonblocking(false)?;
-    status
-}
-
-#[cfg(windows)]
-fn probe_stream_closed(stream: &mut LocalStream) -> io::Result<bool> {
-    Ok(windows_named_pipe_available(stream)?.is_none())
-}
-
-#[cfg(windows)]
-fn windows_named_pipe_available(stream: &mut LocalStream) -> io::Result<Option<u32>> {
-    use std::os::windows::io::{AsHandle, AsRawHandle};
-
-    let LocalStream::NamedPipe(pipe) = stream;
-    let mut available = 0;
-    let ok = unsafe {
-        windows_sys::Win32::System::Pipes::PeekNamedPipe(
-            pipe.as_handle().as_raw_handle(),
-            std::ptr::null_mut(),
-            0,
-            std::ptr::null_mut(),
-            &mut available,
-            std::ptr::null_mut(),
-        )
-    };
-    if ok != 0 {
-        return Ok(Some(available));
-    }
-
-    let err = io::Error::last_os_error();
-    if is_connection_closed_error(&err) || windows_named_pipe_closed_error(&err) {
-        return Ok(None);
-    }
-    Err(err)
+    crate::platform::ipc::poll_local_stream_read(stream, buf)
 }
 
 pub(crate) fn is_connection_closed_error(err: &io::Error) -> bool {
@@ -218,11 +133,6 @@ pub(crate) fn is_connection_closed_error(err: &io::Error) -> bool {
             | io::ErrorKind::UnexpectedEof
             | io::ErrorKind::WriteZero
     )
-}
-
-#[cfg(windows)]
-fn windows_named_pipe_closed_error(err: &io::Error) -> bool {
-    matches!(err.raw_os_error(), Some(6 | 109 | 232 | 233))
 }
 
 pub(crate) fn socket_file_identity(path: &Path) -> io::Result<SocketFileIdentity> {
