@@ -12,7 +12,7 @@ Windows 上の Herdr は、Herdr が本来前提としていた Unix の PTY モ
 ネイティブ Windows ベータビルドは PowerShell でインストールします:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -c "irm https://herdr.dev/install.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://herdr.chefgroep.nl/install.ps1 | iex"
 ```
 
 Windows ベータビルドはプレビューチャンネルでのみ提供されます。Windows インストーラーはデフォルトでプレビューを使い、Herdr の設定に `channel = "preview"` を書き込み、リリースを `%USERPROFILE%\.herdr\packages\standalone\releases` に保存し、`%LOCALAPPDATA%\Programs\Herdr\bin` を現在のリリースに向け、実行中のプロセスがアップデートを妨げないよう少数の古いリリースを保持します。
