@@ -101,7 +101,8 @@ impl PiSessionWatcher {
             if self.emitted.contains(path) {
                 continue; // already announced
             }
-            if let Some(ended) = parse_ended_session(path) {
+            // path is &PathBuf here; parse wants &Path, emitted wants PathBuf.
+            if let Some(ended) = parse_ended_session(path.as_ref()) {
                 out.push(ended.into_envelope());
                 self.emitted.insert(path.clone());
             }

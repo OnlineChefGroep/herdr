@@ -557,4 +557,15 @@ pub enum EventData {
     LayoutUpdated {
         layout: super::panes::PaneLayoutSnapshot,
     },
+    /// Fired when a Pi session JSONL stops growing. Payload mirrors what
+    /// chef-pi-eval ingests.
+    PiSessionEnded {
+        session_id: String,
+        cwd: String,
+        host: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        last_stop_reason: Option<String>,
+        event_count: u64,
+        session_file: String,
+    },
 }

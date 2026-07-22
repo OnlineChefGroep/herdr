@@ -4501,6 +4501,7 @@ mod tests {
             next_client_id: 1,
             foreground_client_id: None,
             server_keybindings,
+            pi_session_watcher: crate::pi_sessions::PiSessionWatcher::new(),
             server_config_diagnostic: None,
             server_config_diagnostic_without_keybindings: None,
             terminal_attach_owners: HashMap::new(),
