@@ -116,7 +116,10 @@ fn sessions_dir() -> PathBuf {
         return PathBuf::from(dir);
     }
     let home = std::env::var_os("HOME").unwrap_or_default();
-    PathBuf::from(home).join(".pi").join("agent").join("sessions")
+    PathBuf::from(home)
+        .join(".pi")
+        .join("agent")
+        .join("sessions")
 }
 
 /// One-shot directory scan → (file, mtime) for every `*.jsonl` under root.
@@ -224,7 +227,8 @@ mod tests {
     use std::time::Duration;
 
     fn tmp(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("herdr-pi-watch-{}-{}", std::process::id(), name));
+        let dir =
+            std::env::temp_dir().join(format!("herdr-pi-watch-{}-{}", std::process::id(), name));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir
@@ -235,9 +239,17 @@ mod tests {
         fs::create_dir_all(&session_dir).unwrap();
         let path = session_dir.join(format!("{id}.jsonl"));
         let mut f = fs::File::create(&path).unwrap();
-        writeln!(f, "{{\"type\":\"session\",\"id\":\"{id}\",\"cwd\":\"/home/joep\"}}").unwrap();
+        writeln!(
+            f,
+            "{{\"type\":\"session\",\"id\":\"{id}\",\"cwd\":\"/home/joep\"}}"
+        )
+        .unwrap();
         if let Some(s) = stop {
-            writeln!(f, "{{\"type\":\"message\",\"message\":{{\"stopReason\":\"{s}\"}}}}").unwrap();
+            writeln!(
+                f,
+                "{{\"type\":\"message\",\"message\":{{\"stopReason\":\"{s}\"}}}}"
+            )
+            .unwrap();
         }
         // backdate mtime so it reads as stale
         let old = SystemTime::now() - Duration::from_secs(STALE_AFTER_SECS + 60);
@@ -267,7 +279,11 @@ mod tests {
         let dir = root.join("--home-joep--");
         fs::create_dir_all(&dir).unwrap();
         let path = dir.join("fresh.jsonl");
-        fs::write(&path, "{\"type\":\"session\",\"id\":\"x\",\"cwd\":\"/h\"}\n").unwrap();
+        fs::write(
+            &path,
+            "{\"type\":\"session\",\"id\":\"x\",\"cwd\":\"/h\"}\n",
+        )
+        .unwrap();
         // fresh mtime → not stale
 
         std::env::set_var(SESSIONS_DIR_ENV, &root);
