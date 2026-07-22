@@ -80,6 +80,13 @@ pub enum Subscription {
     PaneScrollChanged { pane_id: String },
     #[serde(rename = "layout.updated")]
     LayoutUpdated {},
+    /// Subscribe to Pi coding-agent session-end events. Emitted by the built-in
+    /// `pi_sessions` watcher when a session JSONL stops growing.
+    #[serde(rename = "pi.session.ended")]
+    PiSessionEnded {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cwd: Option<String>,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
@@ -215,6 +222,10 @@ pub enum EventKind {
     PaneAgentDetected,
     PaneAgentStatusChanged,
     LayoutUpdated,
+    /// A Pi coding-agent session JSONL has stopped growing. Emitted by the
+    /// built-in `pi_sessions` watcher (see `src/pi_sessions.rs`) so plugins can
+    /// react the moment a session finishes — e.g. chef-pi-eval's `ingest`.
+    PiSessionEnded,
 }
 
 impl EventKind {
@@ -245,6 +256,7 @@ impl EventKind {
             EventKind::PaneAgentDetected => "pane.agent_detected",
             EventKind::PaneAgentStatusChanged => "pane.agent_status_changed",
             EventKind::LayoutUpdated => "layout.updated",
+            EventKind::PiSessionEnded => "pi.session.ended",
         }
     }
 }
@@ -276,6 +288,7 @@ pub const KNOWN_EVENT_KINDS: &[EventKind] = &[
     EventKind::PaneAgentDetected,
     EventKind::PaneAgentStatusChanged,
     EventKind::LayoutUpdated,
+    EventKind::PiSessionEnded,
 ];
 
 pub const PLUGIN_HOOK_EVENT_KINDS: &[EventKind] = &[
@@ -300,6 +313,9 @@ pub const PLUGIN_HOOK_EVENT_KINDS: &[EventKind] = &[
     EventKind::PaneExited,
     EventKind::PaneAgentDetected,
     EventKind::PaneAgentStatusChanged,
+    /// Not a workspace-lifecycle event, but exposed to plugins so a session-end
+    /// hook (`on = "pi.session.ended"`) fires for any plugin that opts in.
+    EventKind::PiSessionEnded,
 ];
 
 #[cfg(test)]
