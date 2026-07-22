@@ -18,8 +18,8 @@ use super::api_helpers::pane_agent_status;
 use super::state::{
     navigator_display_index_of_row, navigator_display_lines, navigator_first_row_at_or_after,
     text_matches_query, AgentNotificationDelivery, AppState, ContextMenuKind, DragTarget, Mode,
-    NavigatorRow, NavigatorStateFilter, NavigatorTarget, PaneFocusTarget,
-    PendingAgentNotification, ToastKind, ToastNotification, ToastTarget, ViewLayout,
+    NavigatorRow, NavigatorStateFilter, NavigatorTarget, PaneFocusTarget, PendingAgentNotification,
+    ToastKind, ToastNotification, ToastTarget, ViewLayout,
 };
 
 fn is_background_completion_transition(prev_state: AgentState, new_state: AgentState) -> bool {
@@ -1633,7 +1633,10 @@ impl AppState {
             self.right_click_passthrough = None;
         }
 
-        if self.rename_pane_target.is_some_and(|pane_id| pane_ids.contains(&pane_id)) {
+        if self
+            .rename_pane_target
+            .is_some_and(|pane_id| pane_ids.contains(&pane_id))
+        {
             self.rename_pane_target = None;
         }
 
