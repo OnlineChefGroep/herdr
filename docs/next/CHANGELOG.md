@@ -4,7 +4,7 @@
 
 ### Added
 
-- Preview docs cover CHEF fleet plugins that feed the Fleet Ops Bar through `fleet_ops.json`, including Settings → Plugins (`ui.fleet_ops_bar`) and `herdr plugin action invoke` usage.
+- Preview docs cover CHEF fleet plugins that feed the Fleet Ops Bar through `fleet_ops.json`, including Settings → fleet (`ui.fleet_ops_bar`) and `herdr plugin action invoke` usage.
 - Added the opt-in `dev` update channel for direct installs, using the same preview-manifest schema at `/dev.json`.
 
 ### Changed
