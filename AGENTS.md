@@ -261,3 +261,29 @@ Other non-obvious caveats:
 - Running the source build from a plain shell (not inside a Herdr session) auto-spawns a debug server in the separate `herdr-dev` namespace (socket `~/.config/herdr-dev/herdr.sock`), so it never touches an installed stable server. Clear `HERDR_SOCKET_PATH`/`HERDR_CLIENT_SOCKET_PATH` when running from source or a downloaded binary.
 - The TUI needs a real terminal (TTY). For headless verification, run `herdr server` and drive it with the CLI/socket API (see the block above).
 - On Linux containers where `/dev/ptmx` is a symlink to `/dev/pts/ptmx`, the `live_handoff` PTY master fd check accepts both paths.
+
+### GUI desktop (VNC)
+
+An xfce4 desktop runs at boot via TigerVNC on display `:1` (noVNC/websockify front it); nothing extra is needed to start it. To demo the *interactive* herdr TUI (not just the headless server) on that desktop, symlink the downloaded CI binary onto `PATH` and launch it in the xfce4 terminal:
+
+```bash
+sudo ln -sf /tmp/herdr-bin/herdr-linux-x86_64 /usr/local/bin/herdr
+# then, in the desktop terminal: `herdr`  (prefix key is ctrl+b; ctrl+b then o splits)
+```
+
+### Tailscale (userspace networking)
+
+Tailscale is not pre-installed and its default kernel/TUN mode does NOT work on the Cloud VM. Install it (`curl -fsSL https://tailscale.com/install.sh | sh`) and always run the daemon in userspace mode:
+
+```bash
+sudo tailscaled --tun=userspace-networking \
+  --outbound-http-proxy-listen=localhost:1054 --socks5-server=localhost:1055 &
+sudo tailscale up --authkey="$TS_AUTH_KEY_RESUABLE" --hostname=cursor-cloud-herdr --accept-dns=false
+```
+
+Non-obvious caveats:
+
+- The reusable node auth key is provided as the secret `TS_AUTH_KEY_RESUABLE` (note the spelling); `TS_API_KEY` is the tailnet API key, not a node key.
+- `tailscaled` runs as root here, so `tailscale status|ip|ping` need `sudo` (root-owned socket).
+- In userspace mode the host kernel cannot route `100.x`/`fd7a:` addresses directly. `tailscale ping` works (it goes through tailscaled), but for app egress onto the tailnet use the SOCKS5 proxy `localhost:1055` or HTTP proxy `localhost:1054` (e.g. `curl --socks5-hostname localhost:1055 ...`, or `export ALL_PROXY=socks5h://localhost:1055/`).
+- This is a per-session runtime setup (system package + running daemon); it is intentionally NOT in the update script.
