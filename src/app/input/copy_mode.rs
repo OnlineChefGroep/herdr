@@ -987,9 +987,7 @@ fn next_cell_col(glyphs: &[(u16, u16)], cursor_col: u16, max_col: u16) -> u16 {
     // after that glyph. Blank columns still step by one.
     let target = glyphs
         .iter()
-        .find(|(start, width)| {
-            cursor_col >= *start && cursor_col < start.saturating_add(*width)
-        })
+        .find(|(start, width)| cursor_col >= *start && cursor_col < start.saturating_add(*width))
         .map_or_else(
             || cursor_col.saturating_add(1),
             |(start, width)| start.saturating_add(*width),
@@ -1006,9 +1004,10 @@ fn next_cell_col(glyphs: &[(u16, u16)], cursor_col: u16, max_col: u16) -> u16 {
 
 fn prev_cell_col(glyphs: &[(u16, u16)], cursor_col: u16) -> u16 {
     // Trailing cell of a wide glyph: snap back to its leading cell.
-    if let Some(&(start, _)) = glyphs.iter().find(|(start, width)| {
-        cursor_col > *start && cursor_col < start.saturating_add(*width)
-    }) {
+    if let Some(&(start, _)) = glyphs
+        .iter()
+        .find(|(start, width)| cursor_col > *start && cursor_col < start.saturating_add(*width))
+    {
         return start;
     }
     // On a leading cell or blank: previous glyph start, else single-cell step.
