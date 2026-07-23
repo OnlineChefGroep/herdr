@@ -291,7 +291,7 @@ impl ActiveSubscription {
             }
             // Fleet-level event — no workspace/pane/tab to bind to. Subscribe to
             // the event stream; events flow through the shared EventHub.
-            Subscription::PiSessionEnded { .. } => Ok(Self::Event(ActiveEventSubscription {
+            Subscription::PiSessionEnded {} => Ok(Self::Event(ActiveEventSubscription {
                 event_kind: crate::api::schema::EventKind::PiSessionEnded,
                 last_sequence: 0,
             })),

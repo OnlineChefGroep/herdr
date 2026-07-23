@@ -4040,14 +4040,8 @@
               "type": "object"
             },
             {
-              "description": "Subscribe to Pi coding-agent session-end events. Emitted by the built-in\n`pi_sessions` watcher when a session JSONL stops growing.",
+              "description": "Subscribe to Pi coding-agent session-end events. Emitted by the built-in\n`pi_sessions` watcher when a session JSONL stops growing. The event\npayload (`EventData::PiSessionEnded`) carries `cwd`; subscribers filter\nclient-side, matching the other fleet-lifecycle event subscriptions\n(which take no filter fields).",
               "properties": {
-                "cwd": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
                 "type": {
                   "const": "pi.session.ended",
                   "type": "string"

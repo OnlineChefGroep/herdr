@@ -81,12 +81,12 @@ pub enum Subscription {
     #[serde(rename = "layout.updated")]
     LayoutUpdated {},
     /// Subscribe to Pi coding-agent session-end events. Emitted by the built-in
-    /// `pi_sessions` watcher when a session JSONL stops growing.
+    /// `pi_sessions` watcher when a session JSONL stops growing. The event
+    /// payload (`EventData::PiSessionEnded`) carries `cwd`; subscribers filter
+    /// client-side, matching the other fleet-lifecycle event subscriptions
+    /// (which take no filter fields).
     #[serde(rename = "pi.session.ended")]
-    PiSessionEnded {
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        cwd: Option<String>,
-    },
+    PiSessionEnded {},
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
