@@ -65,11 +65,25 @@ pub struct PiSessionWatcher {
     /// Candidate files observed during the last scan (path → mtime).
     seen: Vec<(PathBuf, SystemTime)>,
     last_scan: Option<Instant>,
+    /// Pinned sessions root. `None` (production) resolves via env/default on
+    /// each rescan; `Some(_)` (tests) avoids touching process-global env so
+    /// parallel tests don't clobber each other's `SESSIONS_DIR_ENV`.
+    root: Option<PathBuf>,
 }
 
 impl PiSessionWatcher {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Construct with a pinned sessions root. Used by tests to stay isolated
+    /// from the process-global `SESSIONS_DIR_ENV` (parallel tests would race).
+    #[cfg(test)]
+    pub(crate) fn for_root(root: PathBuf) -> Self {
+        Self {
+            root: Some(root),
+            ..Self::default()
+        }
     }
 
     /// Returns envelopes for every session that ended since the last poll.
@@ -81,7 +95,8 @@ impl PiSessionWatcher {
             .map(|last| now.duration_since(last).as_secs() >= RESCAN_EVERY_SECS)
             .unwrap_or(true);
         if should_scan {
-            self.seen = scan_session_files(sessions_dir());
+            let root = self.root.clone().unwrap_or_else(sessions_dir);
+            self.seen = scan_session_files(root);
             self.last_scan = Some(now);
         }
 
@@ -263,15 +278,12 @@ mod tests {
         let root = tmp("emits");
         write_session(&root, "--home-joep--", "abc123", Some("completed"));
 
-        std::env::set_var(SESSIONS_DIR_ENV, &root);
-        let mut w = PiSessionWatcher::new();
+        let mut w = PiSessionWatcher::for_root(root);
 
         let first = w.poll();
         assert_eq!(first.len(), 1, "first poll emits the ended session");
         let second = w.poll();
         assert!(second.is_empty(), "second poll does not re-emit");
-
-        std::env::remove_var(SESSIONS_DIR_ENV);
     }
 
     #[test]
@@ -287,11 +299,8 @@ mod tests {
         .unwrap();
         // fresh mtime → not stale
 
-        std::env::set_var(SESSIONS_DIR_ENV, &root);
-        let mut w = PiSessionWatcher::new();
+        let mut w = PiSessionWatcher::for_root(root);
         assert!(w.poll().is_empty(), "freshly-written session is not ended");
-
-        std::env::remove_var(SESSIONS_DIR_ENV);
     }
 
     #[test]
