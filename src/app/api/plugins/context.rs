@@ -181,7 +181,7 @@ impl App {
                 }),
             EventData::PiSessionEnded { cwd, .. } => {
                 let mut context = empty_plugin_context(correlation_id);
-                context.workspace_cwd = cwd.clone();
+                context.workspace_cwd = Some(cwd.clone());
                 context
             }
         }

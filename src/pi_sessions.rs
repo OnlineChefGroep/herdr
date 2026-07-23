@@ -92,7 +92,7 @@ impl PiSessionWatcher {
         let mut out = Vec::new();
         // Stable iteration order for deterministic, testable behavior.
         let mut candidates: Vec<&(PathBuf, SystemTime)> = self.seen.iter().collect();
-        candidates.sort_by(|a, b| a.0.cmp(b.0));
+        candidates.sort_by(|a, b| a.0.cmp(&b.0));
 
         for (path, mtime) in candidates {
             if *mtime > stale_cutoff {

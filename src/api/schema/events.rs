@@ -313,8 +313,8 @@ pub const PLUGIN_HOOK_EVENT_KINDS: &[EventKind] = &[
     EventKind::PaneExited,
     EventKind::PaneAgentDetected,
     EventKind::PaneAgentStatusChanged,
-    /// Not a workspace-lifecycle event, but exposed to plugins so a session-end
-    /// hook (`on = "pi.session.ended"`) fires for any plugin that opts in.
+    // Not a workspace-lifecycle event, but exposed to plugins so a session-end
+    // hook (`on = "pi.session.ended"`) fires for any plugin that opts in.
     EventKind::PiSessionEnded,
 ];
 
