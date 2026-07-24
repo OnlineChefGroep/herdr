@@ -20,10 +20,15 @@ pub fn version() -> String {
     }
 }
 
+// Channel checks used only by the Unix remote-handoff path
+// (`src/remote/unix.rs`); remote mode is unsupported on Windows, so gate them
+// to `unix` to avoid dead-code errors on Windows lint.
+#[cfg(unix)]
 pub fn is_preview() -> bool {
     channel() == "preview"
 }
 
+#[cfg(unix)]
 pub fn is_dev() -> bool {
     channel() == "dev"
 }
