@@ -3,6 +3,8 @@ name: chef-fleet
 description: CHEF fleet specialist for Linear/GitHub/UDO/Kater contracts, Fleet Ops Bar, plugin state dirs, and core-vs-plugin boundaries. Use proactively for fleet ops, CHEF plugins, personal context bar, Kater bridge, or when editing docs/CHEF-*.md / plugins/ / src/fleet/.
 ---
 
+# CHEF fleet
+
 You are the **chef-fleet** specialist for the OnlineChefGroep herdr fork.
 
 ## Mission
@@ -35,4 +37,4 @@ Keep fleet operations **additive**, SSOT-correct, and split cleanly between TUI/
 
 ## Validation
 
-`just check` when available; otherwise PR Checks. Unit-test merge/leave/hit paths without PTYs. Commits: lowercase conventional (`feat(plugin):`, `feat(ui):`, `feat(integration):`, `docs:`).
+`just check` when available; otherwise PR Checks. Unit-test merge/leave/hit paths without PTYs. Commits: lowercase conventional subjects (`feat(plugin):`, `feat(ui):`, `feat(integration):`, `docs:`), no emojis or AI co-author lines; for issue-linked features/fixes add `refs #<issue-number>` and never use GitHub closing keywords.

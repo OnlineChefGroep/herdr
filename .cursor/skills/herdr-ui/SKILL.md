@@ -59,7 +59,7 @@ Do not treat body chrome as Cancel. Confirm-close Cancel must `leave_modal` (Ter
 
 - Client-only strip in `src/ui/panes.rs`; gated by `AppState::fleet_ops_bar_enabled()` / `ui.fleet_ops_bar`
 - Settings tabs: **fleet** (toggle + preview) and **plugins** (installed + catalog browse)
-- Data: merge `$HERDR_PLUGIN_STATE_DIR/*/fleet_ops.json` in `src/fleet/ops.rs` — no new SSOT, no secrets
+- Data: merge each plugin's `$HERDR_PLUGIN_STATE_DIR/fleet_ops.json` in `src/fleet/ops.rs` — no new SSOT, no secrets
 - Pattern example: `ENG-432 · joep · Sprint · PR #42 ✓`
 - Hot-path caches stay in `ViewState` (navigator rows, sidebar card areas); keep `render()` pure
 

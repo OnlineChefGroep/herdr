@@ -199,9 +199,9 @@ When CHEF fleet plugins are linked, drive them through the plugin action surface
 ```bash
 herdr plugin list
 herdr plugin action list
-herdr plugin action invoke <plugin-id> <action-id>
+herdr plugin action invoke <action-id> --plugin <plugin-id>
 ```
 
 Typical CHEF plugin ids: `com.chefgroep.linear-context`, `com.chefgroep.github-status`, `com.chefgroep.kater-bridge`, `com.chefgroep.fleet-health`, `com.chefgroep.cloudflare-tunnel`, `com.chefgroep.session-park`, `com.chefgroep.issue-provision`.
 
-Link a local checkout with `herdr plugin link <path>`. Plugins write `fleet_ops.json` under `$HERDR_PLUGIN_STATE_DIR` for the Fleet Ops Bar; keep secrets in the plugin config `.env` only.
+Link a local checkout with `herdr plugin link <path>`. Plugins write `fleet_ops.json` under `$HERDR_PLUGIN_STATE_DIR` for the Fleet Ops Bar; keep secrets in `$HERDR_PLUGIN_CONFIG_DIR/.env` (mode 0600), never commit it, and never copy secrets into `fleet_ops.json`.
