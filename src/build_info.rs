@@ -20,10 +20,15 @@ pub fn version() -> String {
     }
 }
 
+// Only consumed by the unix remote-install path (`src/remote/unix.rs`, gated with
+// `#[cfg(unix)]`); on non-unix targets these are dead code but stay defined so the
+// channel helpers remain a complete, platform-neutral API.
+#[cfg_attr(not(unix), allow(dead_code))]
 pub fn is_preview() -> bool {
     channel() == "preview"
 }
 
+#[cfg_attr(not(unix), allow(dead_code))]
 pub fn is_dev() -> bool {
     channel() == "dev"
 }
