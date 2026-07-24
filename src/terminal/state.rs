@@ -4237,13 +4237,12 @@ mod tests {
 
         assert!(nested_start.is_none());
         assert!(same_session_startup.is_some());
-        assert!(!same_session_startup
-            .expect("same-id startup should be accepted")
-            .session_ref_changed);
-        assert_eq!(
-            terminal.hook_report_sequences.get("herdr:codex"),
-            Some(&21)
+        assert!(
+            !same_session_startup
+                .expect("same-id startup should be accepted")
+                .session_ref_changed
         );
+        assert_eq!(terminal.hook_report_sequences.get("herdr:codex"), Some(&21));
         assert_eq!(
             terminal
                 .persisted_agent_session
@@ -4287,13 +4286,12 @@ mod tests {
 
         assert!(nested_start.is_none());
         assert!(root_update.is_some());
-        assert!(!root_update
-            .expect("same root session should be accepted")
-            .session_ref_changed);
-        assert_eq!(
-            terminal.hook_report_sequences.get("herdr:codex"),
-            Some(&21)
+        assert!(
+            !root_update
+                .expect("same root session should be accepted")
+                .session_ref_changed
         );
+        assert_eq!(terminal.hook_report_sequences.get("herdr:codex"), Some(&21));
         assert_eq!(
             terminal
                 .persisted_agent_session
