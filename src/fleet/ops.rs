@@ -15,6 +15,7 @@ pub const FLEET_OPS_PLUGIN_IDS: &[&str] = &[
     "com.chefgroep.cloudflare-tunnel",
     "com.chefgroep.kater-bridge",
     "com.chefgroep.udo-metrics",
+    "com.chefgroep.issue-provision",
     "com.chefgroep.session-park",
 ];
 
@@ -188,7 +189,7 @@ impl FleetOpsMetadata {
     pub fn personal_summary_line(&self) -> String {
         let mut parts = Vec::new();
         if let Some(issue) = &self.linear_issue {
-            parts.push(format!("ENG-{issue}"));
+            parts.push(format_linear_issue(issue));
         }
         if let Some(assignee) = self.linear_assignee.as_ref().filter(|v| !v.is_empty()) {
             parts.push(assignee.clone());
@@ -247,7 +248,7 @@ impl FleetOpsMetadata {
         }
 
         if let Some(issue) = &self.linear_issue {
-            let mut text = format!("ENG-{issue}");
+            let mut text = format_linear_issue(issue);
             if let Some(assignee) = self.linear_assignee.as_ref().filter(|v| !v.is_empty()) {
                 text.push_str(" · ");
                 text.push_str(assignee);
@@ -316,6 +317,28 @@ impl FleetOpsMetadata {
 
         parts
     }
+}
+
+/// Format a Linear issue label. Plugins may provide either a bare number
+/// (`432`) or a full identifier (`ENG-432`); only prepend the default team
+/// prefix for the bare form so full ids don't render as `ENG-ENG-432`.
+fn format_linear_issue(id: &str) -> String {
+    if issue_has_team_prefix(id) {
+        id.to_string()
+    } else {
+        format!("ENG-{id}")
+    }
+}
+
+/// True when `id` already looks like a full Linear identifier (`ABC-123`).
+fn issue_has_team_prefix(id: &str) -> bool {
+    let Some((prefix, number)) = id.split_once('-') else {
+        return false;
+    };
+    !prefix.is_empty()
+        && prefix.chars().all(|c| c.is_ascii_alphabetic())
+        && !number.is_empty()
+        && number.chars().all(|c| c.is_ascii_digit())
 }
 
 fn state_label(state: AgentState) -> &'static str {
@@ -553,5 +576,32 @@ mod tests {
         assert!(summary.contains("joep"));
         assert!(summary.contains("Sprint"));
         assert!(summary.contains("PR #42"));
+    }
+
+    #[test]
+    fn full_linear_id_is_not_double_prefixed() {
+        let meta = FleetOpsMetadata {
+            host: "sofie".into(),
+            linear_issue: Some("ENG-432".into()),
+            ..Default::default()
+        };
+        assert!(meta.personal_summary_line().contains("ENG-432"));
+        assert!(!meta.personal_summary_line().contains("ENG-ENG-432"));
+
+        let linear = meta
+            .bar_parts("claude", AgentState::Working, None)
+            .into_iter()
+            .find(|part| part.kind == FleetOpsBarKind::Linear)
+            .expect("linear segment present");
+        assert_eq!(linear.text, "ENG-432");
+    }
+
+    #[test]
+    fn bare_linear_id_gets_default_prefix() {
+        assert_eq!(format_linear_issue("432"), "ENG-432");
+        assert_eq!(format_linear_issue("ENG-432"), "ENG-432");
+        assert_eq!(format_linear_issue("ABC-1"), "ABC-1");
+        // Non-identifier hyphenated values keep the default prefix.
+        assert_eq!(format_linear_issue("foo-bar"), "ENG-foo-bar");
     }
 }
