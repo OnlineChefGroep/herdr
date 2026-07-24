@@ -20,10 +20,14 @@ pub fn version() -> String {
     }
 }
 
+// Only consumed by the Unix remote-update path (`src/remote/unix.rs`), so these
+// are dead code on non-Unix targets where that module is not compiled.
+#[cfg_attr(not(unix), allow(dead_code))]
 pub fn is_preview() -> bool {
     channel() == "preview"
 }
 
+#[cfg_attr(not(unix), allow(dead_code))]
 pub fn is_dev() -> bool {
     channel() == "dev"
 }
