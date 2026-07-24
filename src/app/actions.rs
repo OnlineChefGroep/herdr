@@ -3917,7 +3917,7 @@ mod tests {
     fn apply_workspace_git_statuses_updates_matching_workspace() {
         let mut state = app_with_workspaces(&["one", "two"]);
         let first_id = state.workspaces[0].id.clone();
-        let first_cwd = state.workspaces[0].resolved_identity_cwd().unwrap();
+        let first_cwd = state.workspaces[0].identity_cwd.clone();
         let second_id = state.workspaces[1].id.clone();
 
         let terminal_runtimes = crate::terminal::TerminalRuntimeRegistry::new();
@@ -3969,7 +3969,7 @@ mod tests {
     fn apply_workspace_git_statuses_clears_missing_git_status() {
         let mut state = app_with_workspaces(&["one"]);
         let workspace_id = state.workspaces[0].id.clone();
-        let cwd = state.workspaces[0].resolved_identity_cwd().unwrap();
+        let cwd = state.workspaces[0].identity_cwd.clone();
         state.workspaces[0].cached_git_branch = Some("main".into());
         state.workspaces[0].cached_git_ahead_behind = Some((1, 2));
 
@@ -3996,7 +3996,7 @@ mod tests {
         let mut state = app_with_workspaces(&["one"]);
         mark_linked_worktree(&mut state, 0);
         let workspace_id = state.workspaces[0].id.clone();
-        let cwd = state.workspaces[0].resolved_identity_cwd().unwrap();
+        let cwd = state.workspaces[0].identity_cwd.clone();
         let membership = state.workspaces[0].worktree_space().cloned();
 
         let terminal_runtimes = crate::terminal::TerminalRuntimeRegistry::new();

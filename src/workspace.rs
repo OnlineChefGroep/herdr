@@ -1055,10 +1055,6 @@ impl Workspace {
         self.custom_name = Some(name);
     }
 
-    pub fn resolved_identity_cwd(&self) -> Option<PathBuf> {
-        Some(self.identity_cwd.clone())
-    }
-
     pub fn resolved_identity_cwd_from(
         &self,
         terminals: &HashMap<TerminalId, TerminalState>,
@@ -1103,10 +1099,10 @@ impl Workspace {
 
     #[cfg(test)]
     pub fn refresh_git_ahead_behind(&mut self) {
-        let cwd = self.resolved_identity_cwd();
-        self.cached_git_branch = cwd.as_deref().and_then(git_branch);
-        self.cached_git_ahead_behind = cwd.as_deref().and_then(git_ahead_behind);
-        self.cached_git_space = cwd.as_deref().and_then(git_space_metadata);
+        let cwd = &self.identity_cwd;
+        self.cached_git_branch = git_branch(cwd);
+        self.cached_git_ahead_behind = git_ahead_behind(cwd);
+        self.cached_git_space = git_space_metadata(cwd);
     }
 
     pub fn git_status_snapshot_for_cwd_with_cache(
