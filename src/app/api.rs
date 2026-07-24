@@ -319,9 +319,9 @@ impl App {
         let manifest_update_agents =
             if let AppEvent::AgentDetectionManifestsUpdated { updated, .. } = &ev {
                 Some(updated.iter().map(|item| item.agent).collect::<Vec<_>>())
-        } else {
-            None
-        };
+            } else {
+                None
+            };
 
         let mut cwd_to_resolve = None;
         if let AppEvent::TerminalCwdReported { pane_id, cwd } = &ev {
@@ -332,9 +332,11 @@ impl App {
             if let Some(terminal_id) = terminal_id {
                 if let Some(terminal) = self.state.terminals.get(&terminal_id) {
                     if terminal.cwd != *cwd {
-                        if let Some(ws) = self.state.workspaces.iter().find(|ws| {
-                            ws.tabs.first().is_some_and(|tab| tab.root_pane == *pane_id)
-                        }) {
+                        if let Some(ws) =
+                            self.state.workspaces.iter().find(|ws| {
+                                ws.tabs.first().is_some_and(|tab| tab.root_pane == *pane_id)
+                            })
+                        {
                             cwd_to_resolve = Some((ws.id.clone(), cwd.clone()));
                         }
                     }
