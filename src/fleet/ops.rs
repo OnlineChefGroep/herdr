@@ -66,7 +66,7 @@ pub struct PluginCloudflareSummary {
 #[allow(dead_code)]
 pub struct PluginParkedSummary {
     pub count: Option<u32>,
-    pub oldest_hours: Option<u32>,
+    pub oldest_hours: Option<f64>,
 }
 
 /// Fleet operations metadata for a single pane/agent.
@@ -188,7 +188,7 @@ impl FleetOpsMetadata {
     pub fn personal_summary_line(&self) -> String {
         let mut parts = Vec::new();
         if let Some(issue) = &self.linear_issue {
-            parts.push(format!("ENG-{issue}"));
+            parts.push(linear_issue_label(issue));
         }
         if let Some(assignee) = self.linear_assignee.as_ref().filter(|v| !v.is_empty()) {
             parts.push(assignee.clone());
@@ -247,7 +247,7 @@ impl FleetOpsMetadata {
         }
 
         if let Some(issue) = &self.linear_issue {
-            let mut text = format!("ENG-{issue}");
+            let mut text = linear_issue_label(issue);
             if let Some(assignee) = self.linear_assignee.as_ref().filter(|v| !v.is_empty()) {
                 text.push_str(" · ");
                 text.push_str(assignee);
@@ -315,6 +315,18 @@ impl FleetOpsMetadata {
         }
 
         parts
+    }
+}
+
+/// Render a Linear issue label. Plugin inputs may supply either a bare numeric
+/// ID (e.g. "432") or a full Linear key (e.g. "ENG-123", "ABC-123"). Only
+/// synthesize the "ENG-" prefix for bare IDs so full keys are not
+/// double-prefixed into "ENG-ABC-123" / "ENG-ENG-123".
+fn linear_issue_label(issue: &str) -> String {
+    if issue.contains('-') {
+        issue.to_string()
+    } else {
+        format!("ENG-{issue}")
     }
 }
 
@@ -553,5 +565,14 @@ mod tests {
         assert!(summary.contains("joep"));
         assert!(summary.contains("Sprint"));
         assert!(summary.contains("PR #42"));
+    }
+
+    #[test]
+    fn linear_issue_label_does_not_double_prefix_full_keys() {
+        // Bare numeric IDs still get the synthesized ENG- prefix.
+        assert_eq!(linear_issue_label("432"), "ENG-432");
+        // Full Linear keys are rendered as-is.
+        assert_eq!(linear_issue_label("ABC-123"), "ABC-123");
+        assert_eq!(linear_issue_label("ENG-123"), "ENG-123");
     }
 }
