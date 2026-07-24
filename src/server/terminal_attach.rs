@@ -13,10 +13,10 @@ pub(crate) fn paste_payload_for_runtime(
 ///
 /// Complete host bracketed-paste sequences are stripped and only re-wrapped when
 /// the attached pane has enabled DECSET 2004. Other input is forwarded unchanged.
-pub(crate) fn rewrite_attach_input_bytes(
+pub(crate) fn rewrite_attach_input_bytes<'a>(
     runtime: &crate::terminal::TerminalRuntime,
-    data: &[u8],
-) -> std::borrow::Cow<'_, [u8]> {
+    data: &'a [u8],
+) -> std::borrow::Cow<'a, [u8]> {
     let bracketed = runtime
         .input_state()
         .map(|state| state.bracketed_paste)
